@@ -257,7 +257,7 @@
                 <label for="quantity">Quantity:</label>
                 <input type="number" id="quantity" name="quantity" min="1" max="1000">
 
-                <label for="price">Price per Unit:</label>
+                <label for="price">Price:</label>
                 <span class="input-symbol-dollar">
                 <input type="number" id="price" name="price" min="0.00" max="10000.00" step="0.01", value="Read-only value" readonly>
             </span>
@@ -291,17 +291,16 @@
             <!-- You can add more details here as needed -->
             <label for="total">Total:</label>
 
-
             <span class="input-symbol-dollar">
             <input type="number" id="total" name="total" min="0.00" max="100000.00" step="0.01", value="Read-only value" readonly>
             </span>
             <button type="button" id="place-order">Place Order</button>
-            <div id="delivery-dates"></div>
         </div>
         <div class="invoice-box">
 
             <h2>Invoice</h2>
             <div id="invoice-contents">
+                <p>Orders populate here...</p>
             </div>
 
             <!-- You can add more details here as needed -->
@@ -320,119 +319,92 @@
 
 <!-- ... Updating the products available based on the suppliers  ... -->
 <!-- ... Updating the price based on product  ... -->
+<script>
+    const productInput = document.getElementById('product');
+    const priceInput = document.getElementById('price');
+
+    productInput.addEventListener('change', function() {
+        // Generate a random price between 50 and 100
+        const randomPrice = Math.random() * (100 - 50) + 50;
+
+        // Round the price to two decimal places and update the price input
+        priceInput.value = randomPrice.toFixed(2);
+    });
+</script>
+
+
 
 <script>
     const supplierInput = document.getElementById('supplier');
     const productInput = document.getElementById('product');
-    const priceInput = document.getElementById('price');
-    const quantityInput = document.getElementById('quantity');
-    const deliveriesInput = document.getElementById('deliveries');
-    const totalInput = document.getElementById('total');
-    const invoiceContents = document.getElementById('invoice-contents');
-    const placeOrderButton = document.getElementById('place-order');
-    const dateInput = document.getElementById('date');
-    const orderForm = document.querySelector('form'); // Assuming there's only one form on the page
-    const frequencyInput = document.getElementById('frequency');
-    const deliveryDatesDiv = document.getElementById('delivery-dates')
-
     const productsBySupplier = {
         "East Bay Food Distributors": ["Product 1A", "Product 1B", "Product 1C"],
         "Pleasents Valley Microgreens": ["Product 2A", "Product 2B", "Product 2C"],
-        "Fish Ranch": ["Product 3A", "Product 3B", "Product 3C"],
+        "Fish Ranch": ["Product 3A", "Product 3B", "Product 3C"], 
         "White Fence Farm": ["Product 1A", "Product 1B", "Product 1C"],
         "Key Lime Distributors": ["Product 2A", "Product 2B", "Product 2C"],
+
+
     };
 
-    function updateTotal() {
-        const price = parseFloat(priceInput.value) || 0;
-        const quantity = parseInt(quantityInput.value) || 0;
-        const deliveries = parseInt(deliveriesInput.value) || 0;
-        const total = price * quantity * deliveries;
-        totalInput.value = total.toFixed(2); // Format to 2 decimal places
-    }
-
-
-    function calculateDeliveryDates() {
-    if (!dateInput.value) {
-        deliveryDatesDiv.innerHTML = "Please enter a valid start date.";
-        return; // Exit the function if no date is provided
-    }
-
-    const startDate = new Date(dateInput.value);
-    if (isNaN(startDate.getTime())) {
-        deliveryDatesDiv.innerHTML = "Invalid date. Please enter a valid start date.";
-        return; // Exit the function if date is invalid
-    }
-
-    const frequency = frequencyInput.value;
-    const numDeliveries = parseInt(deliveriesInput.value);
-    const dates = [];
-
-    for (let i = 0; i < numDeliveries; i++) {
-        let date = new Date(startDate);
-
-        if (frequency === 'weekly') {
-            date.setDate(date.getDate() + (i * 7));
-        } else if (frequency === 'monthly') {
-            date.setMonth(date.getMonth() + i);
-        }
-
-        dates.push(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`);
-    }
-
-    deliveryDatesDiv.innerHTML = `Delivery Dates: ${dates.join(', ')}`;
-}
-    
-    frequencyInput.addEventListener('change', calculateDeliveryDates);
-    deliveriesInput.addEventListener('input', calculateDeliveryDates);
-    dateInput.addEventListener('change', calculateDeliveryDates);
-
-
-
     supplierInput.addEventListener('change', function() {
+        // Get the selected supplier
         const selectedSupplier = supplierInput.options[supplierInput.selectedIndex].text;
-        const products = productsBySupplier[selectedSupplier] || [];
 
+        // Get the products for the selected supplier
+        const products = productsBySupplier[selectedSupplier];
+
+        // Remove all options from the product dropdown
         productInput.innerHTML = '';
+
+        // Add new options to the product dropdown
         products.forEach(product => {
             const option = document.createElement('option');
             option.value = product;
             option.text = product;
             productInput.appendChild(option);
         });
-
-        if (products.length) productInput.dispatchEvent(new Event('change'));
     });
 
-    productInput.addEventListener('change', function() {
-        const randomPrice = Math.random() * (100 - 50) + 50;
-        priceInput.value = randomPrice.toFixed(2);
-        updateTotal(); // Update total whenever product changes and price is updated
-    });
-
-    priceInput.addEventListener('input', updateTotal);
-    quantityInput.addEventListener('input', updateTotal);
-    deliveriesInput.addEventListener('input', updateTotal);
-
-    placeOrderButton.addEventListener('click', function() {
-        const total = totalInput.value;
-        const supplier = supplierInput.options[supplierInput.selectedIndex].text;
-        const product = productInput.options[productInput.selectedIndex].text;
-        const date = dateInput.value;
-        const invoiceText = `Total: $${total} - ${supplier} - ${product} on ${date}`;
-
-        const newLineItem = document.createElement('p');
-        newLineItem.textContent = invoiceText;
-        invoiceContents.appendChild(newLineItem);
-
-        orderForm.reset(); // Reset the form to clear all inputs
-        updateTotal(); // Recalculate total after reset to ensure consistency
-    });
-
+    // Initial population of the product dropdown
     supplierInput.dispatchEvent(new Event('change'));
 </script>
 
 
+
+
+
+
+
+
+<script>
+
+  const invoiceContents = document.getElementById('invoice-contents');
+  const placeOrderButton = document.getElementById('place-order');
+
+  const supplierInput = document.getElementById('supplier');
+  const productInput = document.getElementById('product');
+  const dateInput = document.getElementById('date');
+
+  function addToInvoice() {
+    // Get the current values from the form inputs
+    const supplier = supplierInput.options[supplierInput.selectedIndex].text;
+    const product = productInput.options[productInput.selectedIndex].text;
+    const date = dateInput.value;
+
+    // Create the invoice line item text
+    const invoiceText = `${supplier} - ${product} on ${date}`;
+
+    // Create the new line item as a paragraph element
+    const newLineItem = document.createElement('p');
+    newLineItem.textContent = invoiceText;
+
+    // Append the new line item to the invoice contents
+    invoiceContents.appendChild(newLineItem);
+  }
+
+  placeOrderButton.addEventListener('click', addToInvoice);
+</script>
 
 
 </body>
