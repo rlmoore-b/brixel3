@@ -239,10 +239,10 @@
         <form action="/submit-order" method="post">
                         <label for="supplier">Supplier:</label>
             <select id="supplier" name="supplier">
+                <option value="" disabled selected>Select Supplier</option>
                 <option value="East Bay Food Distributors">East Bay Food Distributors</option>
                 <option value="Pleasents Valley Microgreens">Pleasents Valley Microgreens</option>
                 <option value="Fish Ranch">Fish Ranch</option>
-                <option value="White Fence Farm">White Fence Farm</option>
                 <option value="Key Lime Distributors">Key Lime Distributors</option>
             </select>
 
@@ -266,9 +266,10 @@
                 <label for="datef">Date:</label>
                 <input type="date" id="date" name="date">
 
-            
+
                 <label for="frequency">Frequency</label>
                 <select id="frequency" name="frequency">
+                <option value="" disabled selected>Select Frequency</option>
                 <option value="once">Once</option>
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
@@ -322,6 +323,9 @@
 <!-- ... Updating the price based on product  ... -->
 
 <script>
+    const today = new Date().toISOString().split('T')[0]; // Gets today's date and formats it as YYYY-MM-DD
+    document.getElementById('date').setAttribute('min', today);
+
     const supplierInput = document.getElementById('supplier');
     const productInput = document.getElementById('product');
     const priceInput = document.getElementById('price');
@@ -336,11 +340,10 @@
     const deliveryDatesDiv = document.getElementById('delivery-dates')
 
     const productsBySupplier = {
-        "East Bay Food Distributors": ["Product 1A", "Product 1B", "Product 1C"],
-        "Pleasents Valley Microgreens": ["Product 2A", "Product 2B", "Product 2C"],
-        "Fish Ranch": ["Product 3A", "Product 3B", "Product 3C"],
-        "White Fence Farm": ["Product 1A", "Product 1B", "Product 1C"],
-        "Key Lime Distributors": ["Product 2A", "Product 2B", "Product 2C"],
+        "East Bay Food Distributors": ["Butter 10lb", "Milk 10 gal", "85% lean ground beef (10lb)"],
+        "Pleasents Valley Microgreens": ["broccoli microgreens (10lb)", "sinatch microgreens (10lb)", "buckwheat microgreens (10lb)"],
+        "Fish Ranch": ["Cod Fillet (6 lb)", "Talapia (5 ct.)", "Ahi Tuna (1 fish)"],
+        "Key Lime Distributors": ["Crate of Limes", "Buttermilk (8 gallon)", "Honey Grahm Cracker (10 boxes)"],
     };
 
     function updateTotal() {
@@ -375,7 +378,7 @@
             date.setDate(date.getDate() + (i * 7));
         } else if (frequency === 'monthly') {
             date.setMonth(date.getMonth() + i);
-        }
+        }  
 
         dates.push(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`);
     }
@@ -418,8 +421,8 @@
         const total = totalInput.value;
         const supplier = supplierInput.options[supplierInput.selectedIndex].text;
         const product = productInput.options[productInput.selectedIndex].text;
-        const date = dateInput.value;
-        const invoiceText = `Total: $${total} - ${supplier} - ${product} on ${date}`;
+        const date = deliveryDatesDiv.innerHTML
+        const invoiceText = `Total: $${total} - ${supplier} - ${product} ${date}`;
 
         const newLineItem = document.createElement('p');
         newLineItem.textContent = invoiceText;
